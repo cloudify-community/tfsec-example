@@ -1,0 +1,24 @@
+---
+# checks:
+# - code: CIDR001
+#   description: Check to ensure that only approved IPs are allowed for ingress rules
+#   impact: Overly permissive ingress rules introduce additional avenues of compromise
+#   resolution: Use only approved IPs for ingress rules
+#   requiredTypes:
+#   - resource
+#   requiredLabels:
+#     - aws_security_group
+#   severity: CRITICAL
+#   matchSpec:
+#     name: ingress
+#     action: isPresent
+#     subMatch:
+#       name: cidr_blocks
+#       action: onlyContains
+#       value:
+#         - "203.0.113.10/32"
+#         - "203.0.113.47/32"
+#         - "203.0.113.98/32"
+#   errorMessage: Ingress access is permitted from a non-approved IP range
+#   relatedLinks:
+#   - http://wiki.example.com/security/approved-networks.html

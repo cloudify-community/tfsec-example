@@ -1,0 +1,60 @@
+tosca_definitions_version: cloudify_dsl_1_4
+
+description: Demonstrates the use of tfsec to run Rego policy rules.
+
+imports:
+  - cloudify/types/types.yaml
+  - plugin:cloudify-terraform-plugin
+
+inputs:
+  aws_region:
+    type: string
+    default: us-west-1
+    constraints:
+      - valid_values:
+        - us-east-1
+        - us-west-1
+        - ca-central-1
+        - eu-west-1
+
+  ssh_ips:
+    type: list
+    default: []
+
+node_templates:
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        installation_source: https://releases.hashicorp.com/terraform/1.2.9/terraform_1.2.9_linux_amd64.zip
+
+  terraform_module:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: 'tf_module/terraform.zip'
+        source_path: 'vm/'
+        variables:
+          access_key: { get_secret: 'aws_access_key_id' }
+          aws_region: { get_input: 'aws_region' }
+          instance_type: 't3.micro'
+          secret_key: { get_secret: 'aws_secret_access_key' }
+          ssh_ips: { get_input: 'ssh_ips' }
+      tfsec_config:
+        config:
+          exclude:
+            - 'aws-ec2-no-public-egress-sgr'
+        installation_source: https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64
+        flags_override: []
+          # - 'rego-policy-dir policy/'
+        enable: True
+    relationships:
+      - target: terraform
+        type: cloudify.terraform.relationships.run_on_host
+
+capabilities:
+  instance_id:
+    value: { get_attribute: [ terraform_module, outputs, 'instance_id', value ] }
+  instance_ip:
+    value: { get_attribute: [ terraform_module, outputs, 'instance_ip', value ] }
