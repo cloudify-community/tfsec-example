@@ -34,7 +34,7 @@ node_templates:
       resource_config:
         source:
           location: 'tf_module/terraform.zip'
-        source_path: 'vm/'
+        source_path: 'ec2-instance/'
         variables:
           access_key: { get_secret: 'aws_access_key_id' }
           aws_region: { get_input: 'aws_region' }
