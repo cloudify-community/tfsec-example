@@ -1,6 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_4
 
-description: Demonstrates the use of tfsec to run Rego policy rules.
+description: Demonstrates the use of tfsec to run custom checks.
 
 imports:
   - cloudify/types/types.yaml
@@ -47,7 +47,6 @@ node_templates:
             - 'aws-ec2-no-public-egress-sgr'
         installation_source: https://github.com/aquasecurity/tfsec/releases/download/v1.28.0/tfsec-linux-amd64
         flags_override: []
-          # - 'rego-policy-dir policy/'
         enable: True
     relationships:
       - target: terraform
